@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <title>飞书云文档迁移工具</title>
+
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <div class="row align-items-center">
+        <div class="col-xl-2">
+        </div>
+
+        <div class="col-xl-8">
+            <h1 style="margin-top: 50px;">
+                飞书云文档（我的空间/云盘）迁移说明
+            </h1>
+            <div class="description" style="margin-top: 50px;" th:inline="text">
+                <h2>迁移步骤：</h2>
+                <ul>
+                    <li>添加好友：将新旧企业对应的飞书账号添加为好友。否则，工具无法执行迁移。</li>
+                    <li>账号授权：分别使用迁出企业（旧）与待迁入企业（新）飞书账号授权。</li>
+                    <li>进行扫描：执行文档扫描。只有完成扫描后，才能执行迁移。</li>
+                    <li>开始迁移：完成扫描后执行文档迁移。</li>
+                    <li>迁移报告：迁移完后，系统会自动向用户发送报告。</li>
+                </ul>
+                <p>
+                <h2>效果概述：</h2>
+                <p>使用此工具，会将迁出企业【[[${oldName}]]】下，飞书云文档中我的空间或云盘中的个人文件（包括文件夹、在线文件、
+                文件）按照原结构迁移到迁入企业【[[${newName}]]】的对应账号下。更多迁移效果，参考效果说明文档。</p>
+            </div>
+
+            <div class="row" style="margin-top: 50px;">
+                <div class="col-3">
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary btn-lg"
+                                onclick="window.location.href='/feishu-old'">开始迁移
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2">
+        </div>
+    </div>
+</div>
+</body>
+</html>

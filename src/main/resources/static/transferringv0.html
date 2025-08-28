@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>迁移</title>
+</head>
+<link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<body>
+<div>
+    <h1>状态：</h1>
+</div>
+<div id="procStatus"></div>
+<div id="procMsg"></div>
+<table class="table">
+    <caption></caption>
+    <thead>
+    <tr>
+        <th></th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>文件总数</td>
+        <td id="total">0</td>
+    </tr>
+    <tr>
+        <td>文档数</td>
+        <td id="doc">0</td>
+    </tr>
+    <tr>
+        <td>表格数</td>
+        <td id="sheet">0</td>
+    </tr>
+    <tr>
+        <td>文件夹数</td>
+        <td id="folder">0</td>
+    </tr>
+    <tr>
+        <td>文件数</td>
+        <td id="file">0</td>
+    </tr>
+    </tbody>
+</table>
+
+<table class="table">
+    <caption></caption>
+    <thead>
+    <tr>
+        <th></th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>成功文档数</td>
+        <td id="doc_done" style="color: darkgreen">0</td>
+    </tr>
+    <tr>
+        <td>失败文档数</td>
+        <td id="doc_fail" style="color: darkred">0</td>
+    </tr>
+    <tr>
+        <td>成功表格数</td>
+        <td id="sheet_done" style="color: darkgreen">0</td>
+    </tr>
+    <tr>
+        <td>失败表格数</td>
+        <td id="sheet_fail" style="color: darkred">0</td>
+    </tr>
+    <tr>
+        <td>成功文件夹数</td>
+        <td id="folder_done" style="color: darkgreen">0</td>
+    </tr>
+    <tr>
+        <td>失败文件夹数</td>
+        <td id="folder_fail" style="color: darkred">0</td>
+    </tr>
+    <tr>
+        <td>成功文件数</td>
+        <td id="file_done" style="color: darkgreen">0</td>
+    </tr>
+    <tr>
+        <td>失败文件数</td>
+        <td id="file_fail" style="color: darkred">0</td>
+    </tr>
+    </tbody>
+</table>
+<button onclick="window.location.href = '/transferring.html'">刷新</button>
+<button onclick="reTransfer()">重新开始迁移</button>
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    axios.get('/getdocfromlark');
+    getStatus();
+
+    function getStatus() {
+        axios.get('/userStatus').then(res => {
+            console.log(res.data);
+            let data = res.data;
+            if (!data.procStatus) {
+                return;
+            }
+            document.getElementById("procStatus").innerText = data.procStatus;
+            document.getElementById("procMsg").innerText = data.procMsg;
+            if (data.map.total === 0) {
+                return;
+            }
+
+            document.getElementById("total").innerText = data.map.total;
+            document.getElementById("doc").innerText = data.map.doc;
+            document.getElementById("sheet").innerText = data.map.sheet;
+            document.getElementById("folder").innerText = data.map.folder;
+            document.getElementById("file").innerText = data.map.file;
+
+            document.getElementById("doc_done").innerText = data.map.doc_done;
+            document.getElementById("sheet_done").innerText = data.map.sheet_done;
+            document.getElementById("folder_done").innerText = data.map.folder_done;
+            document.getElementById("file_done").innerText = data.map.file_done;
+
+            document.getElementById("doc_fail").innerText = data.map.doc_fail;
+            document.getElementById("sheet_fail").innerText = data.map.sheet_fail;
+            document.getElementById("folder_fail").innerText = data.map.folder_fail;
+            document.getElementById("file_fail").innerText = data.map.file_fail;
+        }).catch(err => {
+            console.log(err);
+        });
+    }
+
+    function reTransfer() {
+        axios.get('/getdocfromlark');
+    }
+</script>
+</html>

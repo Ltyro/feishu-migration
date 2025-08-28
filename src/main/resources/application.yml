@@ -1,0 +1,64 @@
+server:
+  port: 8060
+
+spring:
+  profiles:
+    active: prod
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+  application:
+    name: feishu-doc-trans-tool
+
+  # 多个接口上的@FeignClient(“相同服务名”)会报错，overriding is disabled。 设置 为true ,即 允许 同名
+  main:
+    allow-bean-definition-overriding: true
+  aop:
+    proxy-target-class: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    default-property-inclusion: non_null
+  thymeleaf:
+    enabled: true
+    encoding: UTF-8
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
+      max-lifetime: 60000
+      idle-timeout: 30000
+      connection-timeout: 30000
+      validation-timeout: 5000
+      connection-test-query: SELECT 1
+      auto-commit: true
+  redis:
+    timeout: 5000
+    lettuce:
+      pool:
+        max-active: 20
+        min-idle: 5
+        max-wait: 5000ms
+        max-idle: 20
+    password: Doc_Trans_Psc@2022@Redis
+
+# mybatis 配置
+mybatis-plus:
+  mapper-locations: classpath:com/lark/service/**/*.xml  #mapper xml扫描
+  typeAliasesPackage: com.lark.rest.*.pojo.entity #小名
+
+mybatis:
+  configuration:
+    mapUnderscoreToCamelCase: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 通用mapper配置
+mapper:
+  not-empty: true #
+  before: true #
+  mappers: tk.mybatis.mapper.common.Mapper #配置的mapper

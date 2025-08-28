@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <title>迁移说明</title>
+</head>
+<style>
+    .description {
+        table-layout: fixed;
+        word-break: break-all;
+    }
+</style>
+<link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<body>
+<h1 style="margin-left: 40px; margin-top: 50px; font-size: 40px;">
+    迁移说明
+</h1>
+<div class="description" style="font-size: 20px; margin-left: 100px; margin-top: 50px; width: 900px;" th:inline="text">
+    <p>本次迁移前，我们需要您将【[[${oldName}]]】的账号与在【[[${newName}]]】的账号先添加好友:
+
+        接下来，我们将会需要您用【[[${oldName}]]】的账号与【[[${newName}]]】的账号，分别对我们的迁移工具进行扫码授权，【请注意授权的租户】
+
+        授权完成后，还需要您在【[[${oldName}]]】下新建一篇文档，并在这篇文档内，手工授权给【[[${newName}]]】的账号;
+
+        <br>当以上工作完成后，接下来就交给我们的程序替您执行文档迁移;
+
+        <br>最终效果能达到:
+
+        <br>1、将您在【[[${oldName}]]】下的飞书云空间-个人空间的文件(包括文件夹、doc、 sheet、 file) 按照原结构迁移到【[[${newName}]]】新账号下:
+
+        <br>2、doc、 sheet迁移内容除了文档内容，还将包括文档的评论，但是不包括文档的历史编辑记录，文档内容中的at某人，则还是原租户下的人，不会对应切换到【[[${newName}]]】的新账号
+
+        <br>3、原【[[${oldName}]]】下的文档，也将全部授权给【[[${newName}]]】的账号，如确实需要查询历史编辑记录，可以通过【[[${oldName}]]】下的文档查看。</p>
+</div>
+<div style="margin-top: 200px; margin-left: 830px;">
+    <div>
+        <button class="btn btn-primary btn-lg" onclick="window.location.href='/old'" style="width: 150px;">开始
+        </button>
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+
+</script>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <title>authorization</title>
+</head>
+<body>
+<h1 style="margin-left: 40px; margin-top: 50px; font-size: 40px;" th:inline="text">
+    请您使用【[[${oldName}]]】账号操作
+</h1>
+<div style="font-size: 20px; margin-left: 100px; margin-top: 50px;" th:inline="text">
+    点击下方【创建文档】按钮后，系统会以您的身份创建一篇文档，并在新窗口打开该文档，请您在<br>新窗口中，用【[[${oldName}]]】账号登陆，并将该文档授权给【[[${newName}]]】下的账号。操作完成后，请回<br>到当前页面，点击【下一步】开始文档迁移。
+</div>
+<div style="margin-top: 200px; margin-left: 830px;">
+    <div>
+        <button class="btn btn-primary btn-lg" onclick="createDoc()" style="width: 150px;" type="button">创建文档</button>
+    </div>
+    <div style="margin-top: 10px;">
+        <button class="btn btn-warning btn-lg" onclick="next()" style="width: 150px;" type="button">下一步</button>
+    </div>
+</div>
+</body>
+</html>
+<link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    function createDoc() {
+        axios.post('/createDoc').then(res => {
+            console.log(res);
+            let url = res.data.url;
+            if (url) {
+                window.open(url);
+            } else {
+                window.location.href = '/authorization';
+            }
+        }).catch(err => {
+            alert("请求错误");
+            console.log(err);
+        });
+    }
+
+    function next() {
+        window.location.href = '/begin_transfer';
+    }
+</script>

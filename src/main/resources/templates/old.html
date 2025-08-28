@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <title th:inline="text">[[${title}]]</title>
+</head>
+<style>
+    .description {
+        table-layout: fixed;
+        word-break: break-all;
+    }
+</style>
+<link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<body>
+<h1 style="margin-left: 40px; margin-top: 50px; font-size: 40px;" th:inline="text">
+    请您使用【[[${name}]]】账号授权
+</h1>
+<div class="description" style="font-size: 20px; margin-left: 100px; margin-top: 50px; width: 900px;" th:inline="text">
+    <p>请在手机上，将您的飞书切换到【[[${name}]]】上，准备好后点击下一步</p>
+</div>
+<div style="margin-top: 200px; margin-left: 830px;">
+    <div>
+        <button class="btn btn-primary btn-lg" onclick="login()" style="width: 150px;">下一步</button>
+    </div>
+</div>
+</body>
+</html>
+<script th:inline="javascript">
+    function login() {
+        const uri = [[${url}]] + '/login';
+        const appId = [[${appId}]];
+        window.location.href = 'https://open.feishu.cn/open-apis/authen/v1/index?redirect_uri=' + uri + '&app_id=' + appId + '&state=';
+    }
+</script>

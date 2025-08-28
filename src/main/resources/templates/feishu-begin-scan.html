@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <title>飞书云文档迁移工具</title>
+</head>
+
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<body>
+
+<div class="container">
+    <div class="row align-items-center">
+        <div class="col-xl-2">
+        </div>
+
+        <div class="col-xl-8">
+            <h1 style="margin-top: 50px;">
+                云文档迁移工作台
+            </h1>
+            <div class="description" style="margin-top: 50px;"
+                 th:inline="text">
+                <div>
+                    <!-- <span>[[${inQueueCount}]]</span> -->
+                    <!-- <span>[[${canTrans}]]</span> -->
+
+                    <h3>当前状态：<span id="spanStatusId">[[${transferStatusZh}]]</span></h3>
+                    <div>
+                        <span>每隔30秒自动刷新一次状态。也可以点击「刷新」按钮，手动刷新。</span>
+                    </div>
+
+                    <div th:switch="${canTrans}">
+                        <!-- <span th:case="'TRUE'">可以执行扫描或迁移。</span>-->
+                        <span th:case="'FALSE'"
+                              style="color: crimson">当前不能执行扫描或迁移。迁移任务池已满，需要排队，请稍后尝试！</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <table class="table table-striped">
+                    <caption></caption>
+                    <thead>
+                    <tr>
+                        <th>工作台功能</th>
+                        <th>功能说明</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="td">扫描</td>
+                        <td class="td">初次迁移之前，需要先执行扫描。</td>
+                    </tr>
+                    <tr>
+                        <td class="td">迁移</td>
+                        <td class="td">在扫描完成后，可执行迁移。</td>
+                    </tr>
+                    <tr>
+                        <td class="td">刷新</td>
+                        <td class="td">刷新当前迁移状态。</td>
+                    </tr>
+                    <tr>
+                        <td class="td">查看报告</td>
+                        <td class="td">迁移中或迁移完成的状态下，可查看迁移报告。</td>
+                    </tr>
+                    <tr>
+                        <td class="td">发送报告</td>
+                        <td class="td">迁移完成或迁移成功状态下，可发送迁移报告。</td>
+                    </tr>
+                    <tr>
+                        <td class="td">返回</td>
+                        <td class="td">返回上一页</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="row" style="margin-top: 50px;">
+                <div class="col-3">
+                    <div class="d-grid gap-2">
+                        <button id="scan" type="button" class="btn btn-primary btn-lg" onclick="scan()">扫描
+                        </button>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="d-grid gap-2">
+                        <button id="transfer" type="button" class="btn btn-primary btn-lg" onclick="trans()">迁移
+                        </button>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary btn-lg" type="button" id="refresh"
+                                onclick="window.location.href='/feishu-begin-scan'">刷新
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 20px;">
+                <div class="col-3">
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary btn-lg" id="report"
+                                onclick="window.location.href='/feishu-trans-report'">查看报告
+                        </button>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary btn-lg" id="reportSend" onclick="sendReport()">
+                            <span id="spinnerId" class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                            <span role="status">发送报告</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="d-grid gap-2">
+<!--                        <button class="btn btn-outline-secondary btn-lg" type="button" onclick="history.back()">返回-->
+<!--                        </button>-->
+                        <button class="btn btn-outline-secondary btn-lg" type="button" onclick="window.location.href = '/feishu-new'">返回
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2">
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    check();
+
+    function check() {
+        let canTrans = '[[${canTrans}]]';
+        console.log("canTrans", canTrans);
+
+        let transferStatus = '[[${transferStatus}]]';
+        console.log("transferStatus", transferStatus);
+
+        $("#spinnerId").attr("style", "visibility: hidden;");
+
+        if (canTrans === "FALSE") {
+            $("#scan").attr("disabled", true);
+            $("#transfer").attr("disabled", true);
+        } else {
+            // - 只有用户的迁移状态为 SCANNED 或 TRANSFERRED 的可以执行迁移。
+            // - SCANNED 表明刚扫描完。
+            // - TRANSFERRED 表明上次迁移执行完了，但是并未全量迁移成功。
+            if (transferStatus === "SCANNED" || transferStatus === "TRANSFERRED") {
+                $("#transfer").attr("disabled", false);
+            } else {
+                $("#transfer").attr("disabled", true);
+            }
+
+            // - 只有用户的迁移状态为 PENDING 的可以执行扫描。
+            if (transferStatus === "PENDING") {
+                $("#scan").attr("disabled", false);
+            } else {
+                $("#scan").attr("disabled", true);
+            }
+        }
+
+        // - 在迁移状态为 TRANSFERRING 或 TRANSFERRED 或 SUCCESS 的可以查看迁移报告。
+        //   - TRANSFERRING 表明正在执行迁移。
+        //   - TRANSFERRED 表明迁移完了，又失败的。
+        //   - SUCCESS 表明迁移完成且成功。
+        if (transferStatus === "TRANSFERRING" || transferStatus === "TRANSFERRED" || transferStatus === "SUCCESS") {
+            $("#report").attr("disabled", false);
+            $("#reportSend").attr("disabled", false);
+
+            if (transferStatus === "TRANSFERRING") {
+                $("#spanStatusId").attr("class", "bg-warning");
+            }
+
+            if (transferStatus === "TRANSFERRED") {
+                $("#spanStatusId").attr("class", "bg-danger");
+            }
+
+            if (transferStatus === "SUCCESS") {
+                $("#spanStatusId").attr("class", "bg-info");
+            }
+        } else {
+            $("#report").attr("disabled", true);
+            $("#reportSend").attr("disabled", true);
+        }
+    }
+
+    function scan() {
+        $("#scan").attr("disabled", true);
+
+        axios.get('/feishu-session-check').then(res => {
+            console.log(res);
+
+            if (res.data === "notLogin") {
+                alert("登录状态生效，需要重新授权。");
+                window.location.href = '/begin';
+            } else {
+                // 异步扫描
+                axios.get('/feishu-old-scan').catch(err => {
+                    alert("请求错误，稍后重试！");
+                    console.log(err);
+                });
+
+                $("#scan").attr("disabled", false);
+                alert("文档扫描已启动，根据文档量的不同，扫描耗时在几秒钟到几分钟不等。可通过刷新状态查看扫描情况！");
+                window.location.href='/feishu-begin-scan'
+            }
+        }).catch(err => {
+            alert("请求错误");
+            console.log(err);
+        })
+
+        // 异步扫描
+        // axios.get('/feishu-old-scan').catch(err => {
+        //     alert("请求错误，稍后重试！");
+        //     console.log(err);
+        // });
+        //
+        // alert("文档扫描已启动，根据文档量的不同，扫描耗时在几秒钟到几分钟不等。可通过刷新状态查看扫描情况！");
+
+        // 同步执行代码示例：
+        // axios.get('/feishu-old-scan').then(res => {
+        //     console.log(res);
+        //     // window.location.href = '/feishu-transferring.html';
+        // }).catch(err => {
+        //     alert("请求错误");
+        //     console.log(err);
+        // })
+
+        // let canTrans = '[[${canTrans}]]';
+        // console.log("canTrans",canTrans);
+        //
+        // if(canTrans==="FALSE"){
+        //     alert("任务已排满，需要排队，请稍后尝试！");
+        // } else{
+        //     axios.get('/feishu-old-scan').then(res => {
+        //         console.log(res);
+        //         window.location.href = '/feishu-transferring.html';
+        //     }).catch(err => {
+        //         alert("请求错误");
+        //         console.log(err);
+        //     })
+        // }
+    }
+
+    function trans() {
+        // 同步执行代码示例：
+        // axios.get('/feishu-secure-labels').then(res => {
+        //     console.log(res);
+        //     if (res === "canTrans") {
+        //         axios.get('/feishu-trans').catch(err => {
+        //             alert("请求错误，稍后重试！");
+        //             console.log(err);
+        //         });
+        //
+        //         window.location.href = '/feishu-trans-report';
+        //     } else {
+        //         alert("无法获取迁出租户密级列表，不能执行迁移！");
+        //     }
+        // }).catch(err => {
+        //     alert("请求错误");
+        //     console.log(err);
+        // });
+
+
+        axios.get('/feishu-session-check').then(res => {
+            console.log(res);
+
+            if (res.data === "notLogin") {
+                alert("登录状态失效，需要重新授权。");
+                window.location.href = '/begin';
+            } else {
+                // 异步请求后台服务，然后，直接跳转到迁移报告页面。
+                axios.get('/feishu-trans').catch(err => {
+                    alert("请求错误，稍后重试！");
+                    console.log(err);
+                });
+
+                window.location.href = '/feishu-trans-report';
+            }
+        }).catch(err => {
+            alert("请求错误");
+            console.log(err);
+        })
+    }
+
+    function sendReport() {
+        $("#reportSend").attr("disabled", true);
+        $("#spinnerId").attr("style", "visibility: show;");
+
+        axios.get('/feishu-notification').then(res => {
+            $("#reportSend").attr("disabled", false);
+            $("#spinnerId").attr("style", "visibility: hidden;");
+
+            console.log(res);
+
+            if (res.data === "notLogin") {
+                window.location.href = '/begin';
+                return;
+            }
+
+            alert("迁移报告已发送！");
+        }).catch(err => {
+            alert("请求错误");
+            console.log(err);
+        });
+    }
+
+    function myRefresh() {
+        window.location.reload();
+    }
+
+    // 每隔30秒刷新一次
+    setTimeout('myRefresh()', 30000);
+</script>
+</html>

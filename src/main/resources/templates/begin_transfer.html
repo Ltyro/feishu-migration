@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <title>begin_transfer</title>
+</head>
+<style>
+    .description {
+        table-layout: fixed;
+        word-break: break-all;
+    }
+</style>
+<link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<body>
+<h1 style="margin-left: 40px; margin-top: 50px; font-size: 40px;">
+    开始迁移文档吧
+</h1>
+<div class="description" style="font-size: 20px; margin-left: 100px; margin-top: 50px; width: 900px;" th:inline="text">
+    <p class="wrap" style="display: inline;" th:inline="text">按照刚刚您的操作，您在【[[${oldName}]]】下（姓名：
+        <p id="oldName" style="display: inline;">
+            XXX
+        </p>
+        ）下的文档将授权，并迁移到【[[${newName}]]】（姓名：
+        <p id="newName" style="display: inline;">
+            XXX
+        </p>
+        ）下。点击下一步，开始迁移文档吧
+    </p>
+</div>
+<div style="margin-top: 200px; margin-left: 830px;">
+    <div>
+        <button class="btn btn-primary btn-lg" onclick="re()" style="width: 150px;">重新授权</button>
+    </div>
+    <div style="margin-top: 10px;">
+        <button class="btn btn-warning btn-lg" onclick="window.location.href='/begin_transfer'"
+                style="width: 150px;">刷新信息
+        </button>
+    </div>
+    <div style="margin-top: 10px;">
+        <button class="btn btn-success btn-lg" disabled=true id="next" onclick="start()" style="width: 150px;">下一步
+        </button>
+    </div>
+</div>
+
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script>
+    check();
+
+    function check() {
+        axios.get('/getName').then(res => {
+            console.log(res);
+            let isSuccess = res.data.isSuccess;
+            if (isSuccess == '0') {
+                alert("未检测到一个新账号，请重新授权")
+            } else if (isSuccess == '1') {
+                $("#oldName").text(res.data.oldName);
+                $("#newName").text(res.data.newName);
+                $("#next").attr("disabled", false);
+            }
+        })
+    }
+
+    function re() {
+        axios.post('/createDoc').then(res => {
+            console.log(res);
+            let url = res.data.url;
+            if (url) {
+                window.open(url);
+            } else {
+                window.location.href = '/begin_transfer';
+            }
+        }).catch(err => {
+            alert("请求错误");
+            console.log(err);
+        })
+    }
+
+    function start() {
+        axios.get('/getdocfromlark').then(res => {
+            window.location.href = '/transferring.html';
+        }).catch(err => {
+            alert("请求错误");
+            console.log(err);
+        })
+    }
+</script>
+</html>

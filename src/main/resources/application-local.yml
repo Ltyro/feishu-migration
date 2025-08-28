@@ -1,0 +1,72 @@
+spring:
+  datasource:
+    # 需要修改 mysql 数据库的 ip、端口、schema 信息。
+    url: jdbc:mysql://127.0.0.1:3306/larkmig?characterEncoding=utf8&useSSL=false&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    # 数据库账号
+    username: todo
+    # 数据库密码
+    password: todo
+  redis:
+    # redis 主机ip
+    host: 127.0.0.1
+    # redis 主机端口
+    port: 6379
+
+    database: 3
+    # redis 无密码可以不配置，删掉 password 配置项。redis 有密码，需要保留并配置。
+    password: todo
+
+
+lark:
+  # 飞书接口回调地址（部署后服务器的 ip 信息）
+#  serverIp: 101.37.151.150
+  serverIp: 127.0.0.1
+
+  # 同时迁移的最大并发数，推荐值：5，最大值：10。
+  maxCountInQueue: 5
+  url: http://${lark.serverIp}:${server.port}
+  authPath: feishu-login
+
+  # 老租户应用凭证
+  old:
+    name: todo
+    # 迁出（旧）企业的自建应用 appId
+    appId: todo
+    # 迁出（旧）企业的自建应用 appSecret
+    appSecret: todo
+    # 最低等级标签的名称。若企业无密级信息，需要配置为：NA。飞书中查看路径：飞书管理后台 - 安全 - 数据保护 - 密级标签 - 0 级-最低
+    lowestLevelName: NA
+
+    qrAddress: https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=${lark.old.appId}&redirect_uri=http%3A%2F%2F${lark.serverIp}%3A${server.port}%2F${lark.authPath}&response_type=code&state=old
+
+  # 新租户应用凭证
+  new:
+    # 迁入（新）企业的自建应用名称
+    name: todo
+    # 迁入（新）企业的自建应用 appId
+    appId: todo
+    # 迁入（新）企业的自建应用 appSecret
+    appSecret: todo
+
+    qrAddress: https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=${lark.new.appId}&redirect_uri=http%3A%2F%2F${lark.serverIp}%3A${server.port}%2F${lark.authPath}&response_type=code&state=new
+    # 预留，但未启用的配置，保留不变即可。
+    lowestLevelName: NA
+
+  # 线程池设置
+  task:
+    maxPoolSize: 5
+    queueCapacity: 1000
+
+  download:
+    path: /mnt/lark/doc-trans-tool/download/
+
+logging:
+  level:
+    root: info
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} [%thread] %method:%line - %msg%n"
+  file:
+    # 程序运行日志。建议值：/feishu/doc-trans-tool/log/app.log
+    name: /mnt/lark/doc-trans-tool/log/app.log
+
+debug: false

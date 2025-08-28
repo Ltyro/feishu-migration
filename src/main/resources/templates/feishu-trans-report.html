@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <title>飞书云文档迁移工具</title>
+</head>
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    function getStatus() {
+        axios.get('/userStatus').then(res => {
+            console.log(res.data);
+
+            if (res.data === "notLogin"){
+                window.location.href = '/begin';
+                return;
+            }
+
+            let data = res.data;
+            if (!data.procStatus) {
+                return;
+            }
+            // document.getElementById("procStatus").innerText = data.procStatus;
+            // document.getElementById("procMsg").innerText = data.procMsg;
+            document.getElementById("transStatus").innerText = data.transStatus;
+
+            if (data.transStatusEn === "TRANSFERRING") {
+                $("#transStatus").attr("class", "bg-warning");
+            }
+
+            if (data.transStatusEn === "TRANSFERRED") {
+                $("#transStatus").attr("class", "bg-danger");
+            }
+
+            if (data.transStatusEn === "SUCCESS") {
+                $("#transStatus").attr("class", "bg-info");
+            }
+
+            if (data.map.total === 0) {
+                return;
+            }
+
+            document.getElementById("total").innerText = data.map.total;
+            document.getElementById("doc").innerText = data.map.doc;
+            document.getElementById("sheet").innerText = data.map.sheet;
+            document.getElementById("folder").innerText = data.map.folder;
+            document.getElementById("file").innerText = data.map.file;
+            document.getElementById("bit_table").innerText = data.map.bit_table
+            document.getElementById("other_online").innerText = data.map.other_online;
+
+            document.getElementById("doc_done").innerText = data.map.doc_done;
+            document.getElementById("sheet_done").innerText = data.map.sheet_done;
+            document.getElementById("folder_done").innerText = data.map.folder_done;
+            document.getElementById("file_done").innerText = data.map.file_done;
+            document.getElementById("bit_table_done").innerText = data.map.bit_table_done;
+            document.getElementById("other_online_done").innerText = data.map.other_online_done;
+
+            document.getElementById("doc_fail").innerText = data.map.doc_fail;
+            document.getElementById("sheet_fail").innerText = data.map.sheet_fail;
+            document.getElementById("folder_fail").innerText = data.map.folder_fail;
+            document.getElementById("bit_table_fail").innerText = data.map.bit_table_fail;
+            document.getElementById("file_fail").innerText = data.map.file_fail;
+            document.getElementById("other_online_fail").innerText = data.map.other_online_fail;
+
+
+            $("#doc_none").text(data.map.doc_none);
+            $("#file_none").text(data.map.file_none);
+            $("#sheet_none").text(data.map.sheet_none);
+            $("#folder_none").text(data.map.folder_none);
+            $("#bit_table_none").text(data.map.bit_table_none);
+            $("#other_online_none").text(data.map.other_online_none);
+
+
+            $("#file_download_fail").text(data.map.file_download_fail);
+            $("#file_upload_fail").text(data.map.file_upload_fail);
+            $("#file_download_done").text(data.map.file_download_done);
+            $("#file_upload_done").text(data.map.file_upload_done);
+        }).catch(err => {
+            console.log(err);
+        });
+    }
+
+    function myRefresh() {
+        window.location.reload();
+    }
+
+    // 每隔30秒刷新一次
+    setTimeout('myRefresh()', 30000);
+
+    getStatus();
+</script>
+
+<body>
+<div class="container">
+    <div class="row align-items-center">
+        <div class="col-xl-2">
+        </div>
+
+        <div class="col-xl-8">
+            <div style="margin-top: 50px;">
+                <h1>文档迁移状态：<span id="transStatus"></span></h1>
+                <div style="margin-top: 20px"><span>此页面间隔30秒会自动刷新。也可以点击「刷新状态」按钮手动刷新。</span></div>
+            </div>
+
+            <div style="margin-top: 10px;">
+                <table class="table table-striped"  style="table-layout: fixed; width: 100%;">
+                    <caption></caption>
+                    <thead>
+                    <tr>
+                        <th>迁移总数</th>
+                        <th class="td" id="total">0</th>
+                        <th>&nbsp;&nbsp;</th>
+                        <th>&nbsp;&nbsp;</th>
+                        <th>&nbsp;&nbsp;</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <table class="table table-striped"  style="table-layout: fixed; width: 100%;">
+                    <caption></caption>
+                    <thead>
+                    <tr>
+                        <th>云文档类型</th>
+                        <th>总数</th>
+                        <th>待处理</th>
+                        <th>成功数</th>
+                        <th>失败数</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="td">文件夹</td>
+                        <td class="td" id="folder">0</td>
+                        <td class="td" id="folder_none">0</td>
+                        <td class="td" id="folder_done" style="color: darkgreen;">0</td>
+                        <td class="td" id="folder_fail" style="color: darkred;">0</td>
+                    </tr>
+                    <tr>
+                        <td class="td">doc/docx</td>
+                        <td class="td" id="doc">0</td>
+                        <td class="td" id="doc_none">0</td>
+                        <td class="td" id="doc_done" style="color: darkgreen;">0</td>
+                        <td class="td" id="doc_fail" style="color: darkred;">0</td>
+                    </tr>
+                    <tr>
+                        <td class="td">sheet</td>
+                        <td class="td" id="sheet">0</td>
+                        <td class="td" id="sheet_none">0</td>
+                        <td class="td" id="sheet_done" style="color: darkgreen;">0</td>
+                        <td class="td" id="sheet_fail" style="color: darkred;">0</td>
+                    </tr>
+                    <tr>
+                        <td class="td">bitable</td>
+                        <td class="td" id="bit_table">0</td>
+                        <td class="td" id="bit_table_none">0</td>
+                        <td class="td" id="bit_table_done" style="color: darkgreen;">0</td>
+                        <td class="td" id="bit_table_fail" style="color: darkred;">0</td>
+                    </tr>
+                    <tr>
+                        <td class="td">file</td>
+                        <td class="td" id="file">0</td>
+                        <td class="td" id="file_none">0</td>
+                        <td class="td" id="file_done" style="color: darkgreen;">0</td>
+                        <td class="td" id="file_fail" style="color: darkred;">0</td>
+                    </tr>
+                    <tr>
+                        <td class="td">其他类型</td>
+                        <td class="td" id="other_online">0</td>
+                        <td class="td" id="other_online_none">0</td>
+                        <td class="td" id="other_online_done" style="color: darkgreen;">0</td>
+                        <td class="td" id="other_online_fail" style="color: darkred;">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row" style="margin-top: 20px;">
+                <div class="col-3">
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary btn-lg"
+                                onclick="window.location.href = '/feishu-trans-report'">刷新状态
+                        </button>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-secondary btn-lg" type="button" onclick="window.location.href = '/feishu-begin-scan'">返回
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2">
+        </div>
+    </div>
+</div>
+</body>
+</html>

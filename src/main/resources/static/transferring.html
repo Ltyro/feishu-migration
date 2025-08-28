@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <title>迁移</title>
+</head>
+<link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<style>
+    .table {
+        width: 70%;
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .td {
+        text-align: right;
+    }
+</style>
+<body>
+
+<div style="margin-left: 50px; margin-top: 80px;">
+    <h1>文档迁移状态：</h1>
+    <div id="procStatus"></div>
+    <div id="procMsg"></div>
+    <div id="msg"></div>
+</div>
+
+<div style="margin-left: 400px; margin-right: 200px;">
+
+    <table class="table">
+        <caption></caption>
+        <thead>
+        <tr>
+            <th>文件总数</th>
+            <th class="td" id="total">0</th>
+        </tr>
+        </thead>
+    </table>
+
+    <table class="table table-striped">
+        <caption></caption>
+        <thead>
+        <tr>
+            <th>doc/docx</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>doc/docx总数</td>
+            <td class="td" id="doc">0</td>
+        </tr>
+        <tr>
+            <td>doc/docx待处理</td>
+            <td class="td" id="doc_none">0</td>
+        </tr>
+        <tr>
+            <td>doc/docx成功数</td>
+            <td class="td" id="doc_done" style="color: darkgreen;">0</td>
+        </tr>
+        <tr>
+            <td>doc/docx失败数</td>
+            <td class="td" id="doc_fail" style="color: darkred;">0</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-striped">
+        <caption></caption>
+        <thead>
+        <tr>
+            <th>sheet</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>sheet总数</td>
+            <td class="td" id="sheet">0</td>
+        </tr>
+        <tr>
+            <td>sheet待处理</td>
+            <td class="td" id="sheet_none">0</td>
+        </tr>
+        <tr>
+            <td>sheet成功数</td>
+            <td class="td" id="sheet_done" style="color: darkgreen;">0</td>
+        </tr>
+        <tr>
+            <td>sheet失败数</td>
+            <td class="td" id="sheet_fail" style="color: darkred;">0</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-striped">
+        <caption></caption>
+        <thead>
+        <tr>
+            <th>bitable</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>bitable总数</td>
+            <td class="td" id="bit_table">0</td>
+        </tr>
+        <tr>
+            <td>bitable待处理</td>
+            <td class="td" id="bit_table_none">0</td>
+        </tr>
+        <tr>
+            <td>bitable成功数</td>
+            <td class="td" id="bit_table_done" style="color: darkgreen;">0</td>
+        </tr>
+        <tr>
+            <td>bitable失败数</td>
+            <td class="td" id="bit_table_fail" style="color: darkred;">0</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-striped">
+        <caption></caption>
+        <thead>
+        <tr>
+            <th>文件夹</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>文件夹总数</td>
+            <td class="td" id="folder">0</td>
+        </tr>
+        <tr>
+            <td>文件夹待处理</td>
+            <td class="td" id="folder_none">0</td>
+        </tr>
+        <tr>
+            <td>文件夹成功数</td>
+            <td class="td" id="folder_done" style="color: darkgreen;">0</td>
+        </tr>
+        <tr>
+            <td>文件夹失败数</td>
+            <td class="td" id="folder_fail" style="color: darkred;">0</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-striped">
+        <caption></caption>
+        <thead>
+        <tr>
+            <th>文件</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>文件总数</td>
+            <td class="td" id="file">0</td>
+        </tr>
+        <tr>
+            <td>文件待处理</td>
+            <td class="td" id="file_none">0</td>
+        </tr>
+        <tr>
+            <td>文件下载成功</td>
+            <td class="td" id="file_download_done" style="color: darkgreen;">0</td>
+        </tr>
+        <tr>
+            <td>文件下载失败</td>
+            <td class="td" id="file_download_fail" style="color: darkred;">0</td>
+        </tr>
+        <tr>
+            <td>文件上传成功</td>
+            <td class="td" id="file_upload_done" style="color: darkgreen;">0</td>
+        </tr>
+        <tr>
+            <td>文件上传失败</td>
+            <td class="td" id="file_upload_fail" style="color: darkred;">0</td>
+        </tr>
+        </tbody>
+    </table>
+    <div style="margin-top: 2%; margin-bottom: 1%;">
+        <button class="btn btn-primary " onclick="window.location.href = '/transferring.html'" style="width: 120px;"
+                type="button">刷新状态
+        </button>
+        <!--
+        <button class="btn btn-warning" onclick="reTransfer()" style="margin-left: 50%; width: 120px;" type="button">
+            重新开始迁移
+        </button>
+        -->
+    </div>
+</div>
+<!--<div style="margin-top:50px; margin-left: 400px; margin-bottom: 50px;">-->
+<!--    <button type="button" class="btn btn-primary " onclick="window.location.href = '/transferring.html'">刷新状态</button>-->
+<!--    <button style="margin-left: 70vh;" type="button" class="btn btn-warning" onclick="reTransfer()">重新开始迁移</button>-->
+<!--</div>-->
+
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    getStatus();
+    console.log("haha");
+
+    function getStatus() {
+        axios.get('/userStatus').then(res => {
+            console.log(res.data);
+            let data = res.data;
+            if (!data.procStatus) {
+                return;
+            }
+            document.getElementById("procStatus").innerText = data.procStatus;
+            document.getElementById("procMsg").innerText = data.procMsg;
+            if (data.map.total === 0) {
+                return;
+            }
+
+            document.getElementById("total").innerText = data.map.total;
+            document.getElementById("doc").innerText = data.map.doc;
+            document.getElementById("sheet").innerText = data.map.sheet;
+            document.getElementById("folder").innerText = data.map.folder;
+            document.getElementById("file").innerText = data.map.file;
+            document.getElementById("bit_table").innerText = data.map.bit_table
+
+            document.getElementById("doc_done").innerText = data.map.doc_done;
+            document.getElementById("sheet_done").innerText = data.map.sheet_done;
+            document.getElementById("folder_done").innerText = data.map.folder_done;
+            document.getElementById("bit_table_done").innerText = data.map.bit_table_done;
+
+            document.getElementById("doc_fail").innerText = data.map.doc_fail;
+            document.getElementById("sheet_fail").innerText = data.map.sheet_fail;
+            document.getElementById("folder_fail").innerText = data.map.folder_fail;
+            document.getElementById("bit_table_fail").innerText = data.map.bit_table_fail;
+
+
+            $("#doc_none").text(data.map.doc_none);
+            $("#file_none").text(data.map.file_none);
+            $("#sheet_none").text(data.map.sheet_none);
+            $("#folder_none").text(data.map.folder_none);
+            $("#bit_table_none").text(data.map.bit_table_none);
+
+
+            $("#file_download_fail").text(data.map.file_download_fail);
+            $("#file_upload_fail").text(data.map.file_upload_fail);
+            $("#file_download_done").text(data.map.file_download_done);
+            $("#file_upload_done").text(data.map.file_upload_done);
+        }).catch(err => {
+            console.log(err);
+        });
+    }
+
+    function reTransfer() {
+        axios.get('/getdocfromlark');
+    }
+
+    function myrefresh() {
+        window.location.reload();
+    }
+
+    //指定20秒刷新一次
+    setTimeout('myrefresh()', 20000);
+</script>
+</html>
